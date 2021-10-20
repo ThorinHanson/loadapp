@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">LoadApp</string>
+    <string name="app_description">Download files from Internet</string>
+
+
+    <string name="notification_button">See details</string>
+
+    <string name="button_loading">We are loading </string>
+    <string name="button_download">Download</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="glide">Glide - Image Loading Library by BumpTech</string>
+    <string name="loadapp">LoadApp - Current Repository by Udacity</string>
+    <string name="retrofit">Retrofit - Type-safe HTTP client for Android and Java by Square, Inc.</string>
+    <string name="no_network_toast">You are not connected to the internet</string>
+    <string name="select_option_toast">Please select an option first</string>
+    <string name="okay">Okay</string>
+    <string name="loadapp_notification_channel_id">loadapp_channel</string>
+    <string name="download_complete">Download Complete!</string>
+</resources>
