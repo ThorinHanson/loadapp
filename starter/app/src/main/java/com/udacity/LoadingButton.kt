@@ -21,9 +21,9 @@ class LoadingButton @JvmOverloads constructor(context: Context, attrs: Attribute
     private val loadingBarRect = Rect()
 
     private val valueAnimator = ValueAnimator()
-    private var buttonText = ""
-    private var textLoading = ""
-    private var textNormal = ""
+    private var title: String
+    private lateinit var loading: String
+    private lateinit var default: String
 
     private val paint = Paint().apply {
         isAntiAlias = true
@@ -33,14 +33,14 @@ class LoadingButton @JvmOverloads constructor(context: Context, attrs: Attribute
     var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
         when(new) {
             ButtonState.Clicked -> {
-                buttonText = "Clicked"
+                title = "Clicked"
                 invalidate()
             }
             ButtonState.Loading -> {
-                buttonText = resources.getString(R.string.button_loading)
+                title = resources.getString(R.string.button_loading)
             }
             ButtonState.Completed -> {
-                buttonText = resources.getString(R.string.button_download)
+                title = resources.getString(R.string.button_download)
                 valueAnimator.cancel()
                 sweepAngle = 0f
                 loadingBarRect.right = 0
@@ -51,27 +51,28 @@ class LoadingButton @JvmOverloads constructor(context: Context, attrs: Attribute
     }
 
     init {
-        isClickable = true
         context.withStyledAttributes(attrs, R.styleable.LoadingButton) {
-            textNormal = getString(R.styleable.LoadingButton_textNormal).toString()
-            textLoading = getString(R.styleable.LoadingButton_textLoading).toString()
+            default = getString(R.styleable.LoadingButton_textNormal).toString()
+            loading = getString(R.styleable.LoadingButton_textLoading).toString()
         }
-        buttonText = textNormal
+        title = default
+        isClickable = true
     }
 
     override fun performClick(): Boolean {
         val steps = 100
+        valueAnimator.duration = 5000
 
         valueAnimator.setIntValues(0, steps)
         loadingBarRect.bottom = heightSize
+
         valueAnimator.addUpdateListener { animator ->
             val value = animator.animatedValue as Int
-            println("value - $value")
             loadingBarRect.right = value * widthSize / steps
             sweepAngle = (value * 360 / steps).toFloat()
-            println("Sweep angle: $sweepAngle")
             invalidate()
         }
+
         valueAnimator.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationStart(animation: Animator?) {
                 isClickable = false
@@ -79,12 +80,11 @@ class LoadingButton @JvmOverloads constructor(context: Context, attrs: Attribute
 
             override fun onAnimationEnd(animation: Animator?) {
                 isClickable = true
-                buttonText = textNormal
+                title = default
                 loadingBarRect.right = 0
                 sweepAngle = 0f
             }
         })
-        valueAnimator.duration = 3000
         valueAnimator.start()
 
         return super.performClick()
@@ -110,14 +110,14 @@ class LoadingButton @JvmOverloads constructor(context: Context, attrs: Attribute
 
     private fun drawButtonTitle(canvas: Canvas?) {
         paint.color = Color.WHITE
-        var titleWidth = paint.measureText(buttonText)
+        var titleWidth = paint.measureText(title)
         var centerX = widthSize / 2 - titleWidth / 2
         var centerY = heightSize / 2 - (paint.descent() + paint.ascent()) / 2
-        canvas?.drawText(buttonText, centerX, centerY, paint )
+        canvas?.drawText(title, centerX, centerY, paint )
     }
 
     private fun drawLoadingCircle(canvas: Canvas?) {
-        var titleWidth = paint.measureText(buttonText)
+        var titleWidth = paint.measureText(title)
         canvas?.save()
         canvas?.translate(widthSize / 2 + titleWidth / 2 + (paint.textSize/2), heightSize / 2 - paint.textSize / 2)
         paint.color = context.getColor(R.color.colorAccent)
